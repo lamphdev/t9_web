@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgres://ec2-52-5-1-20.compute-1.amazonaws.com:5432/dfa0jia7gdn1sl
+    username: zzgtmbsxbaqwrj
+    password: e710544e4199b4862412339501a1b61662a71bd0a68e8c1519741fa0b1abc47a
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
