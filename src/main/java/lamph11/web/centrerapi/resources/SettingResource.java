@@ -1,6 +1,7 @@
 package lamph11.web.centrerapi.resources;
 
 import lamph11.web.centrerapi.common.exception.ResourceNotFoundException;
+import lamph11.web.centrerapi.common.io.CookieUtils;
 import lamph11.web.centrerapi.common.io.PageResponse;
 import lamph11.web.centrerapi.resources.dto.setting.SettingDTO;
 import lamph11.web.centrerapi.resources.dto.setting.SettingFilter;
