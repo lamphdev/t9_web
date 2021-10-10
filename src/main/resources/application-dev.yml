@@ -11,3 +11,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+#    open-in-view: false
+    properties:
+      hibernate:
+        generate_statistics: true

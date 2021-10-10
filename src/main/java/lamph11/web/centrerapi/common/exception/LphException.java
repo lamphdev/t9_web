@@ -2,6 +2,8 @@ package lamph11.web.centrerapi.common.exception;
 
 import lamph11.web.centrerapi.common.KeyValue;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.validation.ConstraintViolation;
 import java.util.Collection;
@@ -9,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class LphException extends Throwable{
 
     private String errorCode;

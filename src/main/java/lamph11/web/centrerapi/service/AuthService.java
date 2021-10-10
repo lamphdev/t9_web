@@ -3,7 +3,6 @@ package lamph11.web.centrerapi.service;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
-import com.nimbusds.openid.connect.sdk.UserInfoErrorResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
 import lamph11.web.centrerapi.common.auth.Oauth2Provider;
@@ -16,7 +15,6 @@ import lamph11.web.centrerapi.entity.SocialAccount;
 import lamph11.web.centrerapi.entity.UserInfo;
 import lamph11.web.centrerapi.repository.SocialAccountRepository;
 import lamph11.web.centrerapi.repository.UserInfoRepository;
-import lamph11.web.centrerapi.resources.dto.auth.UserInfoDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +69,8 @@ public class AuthService {
      * @param token    token provided by oauth2 provider
      * @throws LphException validate, runtime exception
      */
-    public void socialLogin(String provider, String token) throws LphException {
+    public UserInfo socialLogin(String provider, String token) throws LphException {
+        SocialAccount socialAccount = null;
         try {
             Optional<Oauth2Provider> optionalProvider = Oauth2Provider.fromName(provider);
             if (!optionalProvider.isPresent())
@@ -90,14 +89,15 @@ public class AuthService {
                 Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findSocialAccount(
                         provider, String.valueOf(userInfoResponse.getUserInfo().getSubject())
                 );
-                SocialAccount socialAccount = null;
                 if (optionalSocialAccount.isPresent()) {
                     socialAccount = optionalSocialAccount.get();
                 } else {
                     socialAccount = registerNewUserFromSocial(oauth2Provider, userInfoResponse.getUserInfo());
                 }
+                return socialAccount.getUserInfo();
             } else {
-                UserInfoErrorResponse userInfoErrorResponse = UserInfoErrorResponse.parse(response);
+                // UserInfoErrorResponse userInfoErrorResponse = UserInfoErrorResponse.parse(response);
+                throw new LphException(ExceptionContains.AUTH_READ_USER_INFO_RESPONSE_ERROR);
             }
         } catch (IOException e) {
             throw new LphException(ExceptionContains.AUTH_GET_USER_INFO_ERROR);

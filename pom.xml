@@ -58,6 +58,27 @@
             <artifactId>thymeleaf-extras-springsecurity5</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.cosium.spring.data</groupId>
+            <artifactId>spring-data-jpa-entity-graph</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.jhipster</groupId>
+            <artifactId>jhipster-framework</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.5.7.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
@@ -123,6 +144,25 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.16</version>
+                        </path>
+                        <path>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>5.5.7.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,23 +1,21 @@
 package lamph11.web.centrerapi.resources;
 
-import com.nimbusds.oauth2.sdk.ParseException;
 import lamph11.web.centrerapi.common.auth.TokenProvider;
 import lamph11.web.centrerapi.common.exception.LphException;
-import lamph11.web.centrerapi.config.ExceptionContains;
+import lamph11.web.centrerapi.common.io.CookieUtils;
 import lamph11.web.centrerapi.entity.UserInfo;
 import lamph11.web.centrerapi.resources.dto.auth.UserInfoDTO;
 import lamph11.web.centrerapi.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.Optional;
+import java.util.Collections;
 
 @Slf4j
 @RestController
@@ -27,6 +25,7 @@ public class AuthResource {
 
     private final AuthService authService;
     private final TokenProvider tokenProvider;
+    private final CookieUtils cookieUtils;
 
     @RequestMapping("/user-info")
     public ResponseEntity getUserInfo(HttpServletRequest httpRequest) throws LphException {
@@ -35,12 +34,20 @@ public class AuthResource {
         return ResponseEntity.ok(userInfoDTO);
     }
 
-    @PostMapping("/{provider}")
+    @PostMapping("/social/{provider}")
     public ResponseEntity socialLogin(
-            @NotNull @PathVariable String provider, @NotNull @RequestHeader String token
-    ) throws LphException, IOException, ParseException {
-        authService.socialLogin(provider, token);
-        return ResponseEntity.ok(true);
+            @NotNull @PathVariable String provider, @NotNull @RequestParam String token
+    ) throws LphException {
+        UserInfo userInfo = authService.socialLogin(provider, token);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userInfo.getId(),
+                null,
+                Collections.emptyList()
+        );
+        String generatedToken = tokenProvider.generateToken(authentication);
+        cookieUtils.writeCookie(AuthService.TOKEN_HEADER_NAME, generatedToken, 6 * 60 * 60 * 1000);
+
+        return ResponseEntity.ok(UserInfoDTO.fromUserInfo(userInfo));
     }
 
 }

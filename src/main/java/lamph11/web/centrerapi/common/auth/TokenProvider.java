@@ -1,16 +1,18 @@
 package lamph11.web.centrerapi.common.auth;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -21,13 +23,13 @@ public class TokenProvider {
 
     public Authentication parseToken(String token) {
         Jws<Claims> jwt = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
+        log.info("subject {}", jwt.getBody().getSubject());
         String username = jwt.getBody().getSubject();
-        SecurityContextHolder.getContext().getAuthentication().getName();
-        String[] roles = jwt.getBody().get("roles", String[].class);
+        List<String> roles = jwt.getBody().get("roles", List.class);
         return new UsernamePasswordAuthenticationToken(
                 username,
                 null,
-                Stream.of(roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
         );
     }
 
@@ -37,7 +39,7 @@ public class TokenProvider {
         return Jwts.builder().signWith(SignatureAlgorithm.HS512, SECRET)
                 .setIssuedAt(new Date(timeNow))
                 .setExpiration(new Date(timeNow + EXPIRE_TIME))
-                .claim("roles", authentication.getAuthorities().toArray(new String[] {}))
+                .claim("roles", authentication.getAuthorities())
                 .setSubject(authentication.getName())
                 .compact();
     }
