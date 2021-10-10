@@ -1,12 +1,17 @@
 package lamph11.web.centrerapi;
 
+import com.cosium.spring.data.jpa.entity.graph.repository.support.EntityGraphJpaRepositoryFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.util.StringUtils;
 
 @SpringBootApplication
+@EnableJpaRepositories(
+        repositoryFactoryBeanClass = EntityGraphJpaRepositoryFactoryBean.class
+)
 public class CentraApiApplication {
 
     public static void main(String[] args) {

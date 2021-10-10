@@ -21,6 +21,8 @@ public enum Oauth2Provider {
 
     Oauth2Provider(String name, String userInfoEndpoint, String nameAttribute) {
         this.name = name;
+        this.userInfoEndpoint = userInfoEndpoint;
+        this.nameAttribute = nameAttribute;
     }
 
     public String getName() {
