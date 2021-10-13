@@ -4,6 +4,7 @@ import lamph11.web.centrerapi.common.auth.TokenProvider;
 import lamph11.web.centrerapi.common.exception.LphException;
 import lamph11.web.centrerapi.common.io.CookieUtils;
 import lamph11.web.centrerapi.entity.UserInfo;
+import lamph11.web.centrerapi.resources.dto.auth.AuthResponse;
 import lamph11.web.centrerapi.resources.dto.auth.UserInfoDTO;
 import lamph11.web.centrerapi.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class AuthResource {
 
     @PostMapping("/social/{provider}")
     public ResponseEntity socialLogin(
-            @NotNull @PathVariable String provider, @NotNull @RequestParam String token
+            @NotNull @PathVariable String provider, @NotNull @RequestParam String token, @RequestParam Boolean writeCookie
     ) throws LphException {
         UserInfo userInfo = authService.socialLogin(provider, token);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -45,9 +46,16 @@ public class AuthResource {
                 Collections.emptyList()
         );
         String generatedToken = tokenProvider.generateToken(authentication);
-        cookieUtils.writeCookie(AuthService.TOKEN_HEADER_NAME, generatedToken, 6 * 60 * 60 * 1000);
+        if (writeCookie) {
+            cookieUtils.writeCookie(AuthService.TOKEN_HEADER_NAME, generatedToken, 6 * 60 * 60 * 1000);
+        }
 
-        return ResponseEntity.ok(UserInfoDTO.fromUserInfo(userInfo));
+        return ResponseEntity.ok(
+                new AuthResponse(
+                        UserInfoDTO.fromUserInfo(userInfo),
+                        generatedToken
+                )
+        );
     }
 
 }
