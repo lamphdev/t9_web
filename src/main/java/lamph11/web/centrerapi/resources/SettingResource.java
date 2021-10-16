@@ -3,15 +3,18 @@ package lamph11.web.centrerapi.resources;
 import lamph11.web.centrerapi.common.exception.ResourceNotFoundException;
 import lamph11.web.centrerapi.common.io.CookieUtils;
 import lamph11.web.centrerapi.common.io.PageResponse;
+import lamph11.web.centrerapi.common.validate.ICreate;
 import lamph11.web.centrerapi.resources.dto.setting.SettingDTO;
 import lamph11.web.centrerapi.resources.dto.setting.SettingFilter;
 import lamph11.web.centrerapi.service.SettingOptionService;
 import lamph11.web.centrerapi.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.groups.Default;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class SettingResource {
     }
 
     @PostMapping
-    public ResponseEntity createSetting(@Valid @RequestBody SettingDTO dto) {
+    public ResponseEntity createSetting(@Validated(Default.class) @RequestBody SettingDTO dto) {
         return ResponseEntity.ok(settingService.create(dto));
     }
 
