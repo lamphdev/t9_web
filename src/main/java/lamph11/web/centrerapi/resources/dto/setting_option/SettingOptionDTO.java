@@ -1,6 +1,7 @@
 package lamph11.web.centrerapi.resources.dto.setting_option;
 
 import lamph11.web.centrerapi.entity.Setting;
+import lamph11.web.centrerapi.resources.dto.setting.SettingDTO;
 import lombok.Data;
 
 @Data
@@ -14,5 +15,5 @@ public class SettingOptionDTO {
 
     private String metadata;
 
-    private Setting setting;
+    private SettingDTO setting;
 }

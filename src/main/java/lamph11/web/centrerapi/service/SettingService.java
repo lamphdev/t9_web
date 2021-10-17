@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +83,7 @@ public class SettingService extends QueryService {
      * @param filter query info
      * @return specification
      */
-    private Specification buildSpecification(SettingFilter filter) {
+    public Specification buildSpecification(SettingFilter filter) {
         Specification specification = Specification.where(null);
 
         if (filter.getId() != null)
