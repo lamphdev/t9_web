@@ -31,6 +31,9 @@ public class CookieUtils {
 
     public Cookie getCookie(String name) {
         Cookie[] cookies = httpServletRequest.getCookies();
+        if (null == cookies || cookies.length < 1)
+            return null;
+
         Arrays.stream(cookies)
                 .map(Cookie::getName)
                 .forEach(System.out::println);
