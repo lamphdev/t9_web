@@ -9,6 +9,7 @@ import lamph11.web.centrerapi.common.auth.Oauth2Provider;
 import lamph11.web.centrerapi.common.auth.TokenProvider;
 import lamph11.web.centrerapi.common.exception.LphException;
 import lamph11.web.centrerapi.common.exception.ResourceNotFoundException;
+import lamph11.web.centrerapi.common.io.CookieUtils;
 import lamph11.web.centrerapi.common.utils.UUIDUtils;
 import lamph11.web.centrerapi.config.ExceptionContains;
 import lamph11.web.centrerapi.entity.SocialAccount;
@@ -18,10 +19,12 @@ import lamph11.web.centrerapi.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
@@ -33,9 +36,10 @@ import java.util.Optional;
 @Transactional(rollbackFor = Exception.class)
 public class AuthService {
 
-    public static final String TOKEN_HEADER_NAME = "token";
-    public static final String TOKEN_PARAM_NAME = "token";
+    public static final String TOKEN_HEADER_NAME = "access_token";
+    public static final String TOKEN_COOKIE_NAME = "access_token";
 
+    private final CookieUtils cookieUtils;
     private final TokenProvider tokenProvider;
     private final UserInfoRepository userInfoRepository;
     private final SocialAccountRepository socialAccountRepository;
@@ -49,8 +53,18 @@ public class AuthService {
      * @throws LphException validate, runtime exception
      */
     public UserInfo getUserInfo(HttpServletRequest httpRequest) throws LphException {
-        String token = Optional.ofNullable(httpRequest.getHeader(TOKEN_HEADER_NAME))
-                .orElse((String) httpRequest.getAttribute(TOKEN_PARAM_NAME));
+        String token = null;
+        Cookie cookie = cookieUtils.getCookie(TOKEN_COOKIE_NAME);
+        if (null != cookie) {
+            token = cookie.getValue();
+        } else {
+            String authHeader = Optional.ofNullable(
+                    httpRequest.getHeader(HttpHeaders.AUTHORIZATION)
+            ).orElse("");
+            if (StringUtils.isEmpty(authHeader)) {
+                token = authHeader.replace("Bearer ", "");
+            }
+        }
 
         if (StringUtils.isEmpty(token))
             throw new LphException(ExceptionContains.AUTH_TOKEN_IS_REQUIRED);
