@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://ec2-54-204-148-110.compute-1.amazonaws.com:5432/db46m5s6n5kcmp
-    username: nwovwyidthoeaa
-    password: 13ad69b50909b7ef7178ac3420ce22be6f01dd96b8aacef9ebf312eb1c094044
+    url: jdbc:postgresql://postgresdb:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       maximum-pool-size: 10

@@ -1,0 +1,43 @@
+version: '3'
+
+networks:
+  story_net:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/lamph11/Desktop/story/dbdata
+
+services:
+  database:
+    hostname: postgresdb
+    image: postgres:13
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - '5432:5432'
+    networks:
+      - story_net
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+  app:
+    hostname: beapp
+    build: .
+    networks:
+      - story_net
+    depends_on:
+      - database
+    ports:
+      - '8080:8080'
+    restart: always
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
