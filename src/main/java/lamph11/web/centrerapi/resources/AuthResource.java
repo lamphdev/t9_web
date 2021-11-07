@@ -47,7 +47,7 @@ public class AuthResource {
         );
         String generatedToken = tokenProvider.generateToken(authentication);
         if (writeCookie) {
-            cookieUtils.writeCookie(AuthService.TOKEN_HEADER_NAME, generatedToken, 6 * 60 * 60 * 1000);
+            cookieUtils.writeCookie(AuthService.TOKEN_COOKIE_NAME, generatedToken, 6 * 60 * 60 * 1000);
         }
 
         return ResponseEntity.ok(
