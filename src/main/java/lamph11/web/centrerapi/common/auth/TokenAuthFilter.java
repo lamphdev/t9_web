@@ -38,7 +38,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         } else {
             token = request.getHeader(HttpHeaders.AUTHORIZATION);
         }
-        log.info("Authorize request with token: {}", token);
+        log.info("Authentication filter with token: {}", token);
         if (!StringUtils.isEmpty(token)) {
             String accessToken = token.replace("Bearer ", "").trim();
             Authentication authentication = tokenProvider.parseToken(accessToken);

@@ -19,7 +19,7 @@ public class DynamicAuthorizationFilter implements FilterInvocationSecurityMetad
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
         FilterInvocation filterInvocation = (FilterInvocation) o;
         String url = filterInvocation.getRequestUrl();
-        log.info("Dynamic authorization: {}", url);
+        log.info("Dynamic authorization filter for url: {}", url);
         if (antPathMatcher.match("", url)) {
 
         }
