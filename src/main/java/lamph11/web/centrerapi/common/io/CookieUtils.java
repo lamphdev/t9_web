@@ -34,9 +34,6 @@ public class CookieUtils {
         if (null == cookies || cookies.length < 1)
             return null;
 
-        Arrays.stream(cookies)
-                .map(Cookie::getName)
-                .forEach(System.out::println);
         Cookie cookie = Arrays.stream(cookies)
                 .filter(c -> c.getName().equals(name))
                 .findFirst().orElse(null);

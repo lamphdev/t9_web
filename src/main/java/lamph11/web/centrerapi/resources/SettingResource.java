@@ -19,7 +19,7 @@ import javax.validation.groups.Default;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/setting")
+@RequestMapping("/api/settings")
 public class SettingResource {
 
     private final SettingService settingService;
@@ -57,7 +57,7 @@ public class SettingResource {
 
     @PostMapping("/{settingId}/options")
     public ResponseEntity<SettingOptionDTO> createOption(
-            @PathVariable("settingId") String settingId, @Validated @ModelAttribute SettingOptionDTO settingOption
+            @PathVariable("settingId") String settingId, @Validated @RequestBody SettingOptionDTO settingOption
     ) throws LphException {
         SettingDTO setting = new SettingDTO();
         setting.setId(settingId);
