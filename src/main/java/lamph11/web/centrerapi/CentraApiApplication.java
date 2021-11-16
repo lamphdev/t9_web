@@ -1,6 +1,7 @@
 package lamph11.web.centrerapi;
 
 import com.cosium.spring.data.jpa.entity.graph.repository.support.EntityGraphJpaRepositoryFactoryBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -8,6 +9,7 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.util.StringUtils;
 
+@Slf4j
 @SpringBootApplication
 @EnableJpaRepositories(
         repositoryFactoryBeanClass = EntityGraphJpaRepositoryFactoryBean.class
