@@ -1,11 +1,12 @@
 package lamph11.web.centrerapi.config;
 
 import lamph11.web.centrerapi.common.auth.DynamicAuthorizationFilter;
+import lamph11.web.centrerapi.common.auth.LphAuthenticationEntrypoint;
 import lamph11.web.centrerapi.common.auth.TokenAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -27,27 +28,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.headers().frameOptions().sameOrigin();
 
-        http.objectPostProcessor(new ObjectPostProcessor<Object>() {
-            @Override
-            public <O> O postProcess(O o) {
-                if (o instanceof FilterSecurityInterceptor) {
-                    ((FilterSecurityInterceptor) o).setSecurityMetadataSource(dynamicAuthorizationFilter);
+        http.authorizeRequests(
+                autho -> {
+                    autho.anyRequest().permitAll();
+                    autho.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                        @Override
+                        public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+                            o.setSecurityMetadataSource(dynamicAuthorizationFilter);
+                            return o;
+                        }
+                    });
                 }
-                return o;
-            }
-        });
+        );
+
 
         http.addFilterBefore(
                 tokenAuthFilter,
                 UsernamePasswordAuthenticationFilter.class
         );
 
-        http.authorizeRequests()
-                .anyRequest().permitAll();
-
         http.sessionManagement(
                 sessionConfig -> {
                     sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                }
+        );
+
+        http.exceptionHandling(
+                handler -> {
+                    handler.authenticationEntryPoint(new LphAuthenticationEntrypoint());
                 }
         );
     }

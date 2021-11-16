@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.groups.Default;
 
 @RestController
@@ -26,7 +28,8 @@ public class SettingResource {
     private final SettingOptionService settingOptionService;
 
     @GetMapping
-    public ResponseEntity querySetting(@ModelAttribute SettingFilter filter) {
+    public ResponseEntity querySetting(@ModelAttribute SettingFilter filter, HttpServletRequest request) {
+        System.out.println(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE));
         return ResponseEntity.ok(PageResponse.from(settingService.querySetting(filter)));
     }
 

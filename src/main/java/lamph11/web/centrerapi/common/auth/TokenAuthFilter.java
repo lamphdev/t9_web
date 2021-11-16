@@ -31,18 +31,24 @@ public class TokenAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
-        String token;
-        Cookie cookie = Optional.ofNullable(cookieUtils.getCookie(AuthService.TOKEN_COOKIE_NAME)).orElse(null);
-        if (null != cookie) {
-            token = cookie.getValue();
-        } else {
-            token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        }
-        log.info("Authentication filter with token: {}", token);
-        if (!StringUtils.isEmpty(token)) {
-            String accessToken = token.replace("Bearer ", "").trim();
-            Authentication authentication = tokenProvider.parseToken(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            String token;
+            Cookie cookie = Optional.ofNullable(cookieUtils.getCookie(AuthService.TOKEN_COOKIE_NAME)).orElse(null);
+            if (null != cookie) {
+                token = cookie.getValue();
+            } else {
+                token = request.getHeader(HttpHeaders.AUTHORIZATION);
+            }
+            if (!StringUtils.isEmpty(token)) {
+                log.info("Validating token: {}", token);
+                String accessToken = token.replace("Bearer ", "").trim();
+                Authentication authentication = tokenProvider.parseToken(accessToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                log.info("Request without token");
+            }
+        } catch (Exception e) {
+            log.error("Validate Token Error", e.getMessage());
         }
         chain.doFilter(request, response);
     }
