@@ -1,12 +1,10 @@
 package lamph11.web.centrerapi.entity;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -23,4 +21,9 @@ public class Role {
     private String description;
 
     private String metadata;
+
+    @PrePersist
+    public void upperCaseRoleName() {
+        this.role = StringUtils.toRootUpperCase(role);
+    }
 }
