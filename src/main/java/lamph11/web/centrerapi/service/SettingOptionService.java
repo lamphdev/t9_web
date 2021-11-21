@@ -15,6 +15,7 @@ import lamph11.web.centrerapi.resources.dto.setting.SettingFilter;
 import lamph11.web.centrerapi.resources.dto.setting_option.SettingOptionDTO;
 import lamph11.web.centrerapi.resources.dto.setting_option.SettingOptionFilter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -69,9 +70,9 @@ public class SettingOptionService extends QueryService<SettingOption> {
      * @throws ResourceNotFoundException
      */
     public SettingOptionDTO create(SettingOptionDTO dto) throws ResourceNotFoundException {
-        Optional<Setting> optionalSetting = settingRepository.findById(dto.getSetting().getId());
+        Optional<Setting> optionalSetting = settingRepository.findById(dto.getSetting().getCode());
         if (!optionalSetting.isPresent())
-            throw new ResourceNotFoundException(Setting.class, dto.getSetting().getId());
+            throw new ResourceNotFoundException(Setting.class, dto.getSetting().getCode());
 
         Setting setting = optionalSetting.get();
         SettingOption settingOption = toSettingOption.apply(dto);
@@ -93,9 +94,9 @@ public class SettingOptionService extends QueryService<SettingOption> {
         if (!optional.isPresent())
             throw new ResourceNotFoundException(SettingOption.class, dto.getId());
 
-        Optional<Setting> optionalSetting = settingRepository.findById(dto.getSetting().getId());
+        Optional<Setting> optionalSetting = settingRepository.findById(dto.getSetting().getCode());
         if (!optionalSetting.isPresent())
-            throw new ResourceNotFoundException(Setting.class, dto.getSetting().getId());
+            throw new ResourceNotFoundException(Setting.class, dto.getSetting().getCode());
 
         SettingOption settingOption = optional.get();
         modelMapper.map(dto, settingOption);
@@ -112,47 +113,36 @@ public class SettingOptionService extends QueryService<SettingOption> {
      */
     public Specification buildSpecification(SettingOptionFilter filter) {
         Specification specification = Specification.where((root, query, builder) -> {
-            if (filter.getSetting() != null) {
-                root.join(SettingOption_.SETTING, JoinType.INNER);
-            }
+//            if (filter.getSetting() != null) {
+//                root.join(SettingOption_.SETTING, JoinType.INNER);
+//            }
             return null;
         });
 
-        if (filter.getId() != null)
-            specification = specification.and(
-                    buildStringSpecification(filter.getId(), SettingOption_.id)
-            );
+        if (filter == null)
+            return specification;
 
-        if (filter.getName() != null)
-            specification = specification.and(
-                    buildStringSpecification(filter.getName(), SettingOption_.name)
-            );
+        if (!StringUtils.isEmpty(filter.getKeyword()))
+            specification = specification.and((root, query, builder) -> builder.or(
+                    builder.like(
+                            builder.lower(root.get(SettingOption_.name)),
+                            "%" + StringUtils.lowerCase(filter.getKeyword()).trim() + "%"
+                    ),
+                    builder.like(
+                            builder.lower(root.get(SettingOption_.value)),
+                            "%" + StringUtils.lowerCase(filter.getKeyword()).trim() + "%"
+                    ),
+                    builder.like(
+                            builder.lower(root.get(SettingOption_.metadata)),
+                            "%" + StringUtils.lowerCase(filter.getKeyword()).trim() + "%"
+                    )
+            ));
 
-        if (filter.getMetadata() != null)
-            specification = specification.and(
-                    buildStringSpecification(filter.getMetadata(), SettingOption_.metadata)
-            );
-
-        if (filter.getValue() != null)
-            specification.and(
-                    buildStringSpecification(filter.getValue(), SettingOption_.value)
-            );
-
-        if (filter.getSetting() != null) {
-            SettingFilter settingFilter = filter.getSetting();
-
-            if (settingFilter.getId() != null)
-                specification = specification.and(
-                        buildReferringEntitySpecification(settingFilter.getId(), SettingOption_.setting, Setting_.id)
-                );
-
-            if (settingFilter.getName() != null)
-                specification = specification.and(
-                        buildReferringEntitySpecification(
-                                settingFilter.getName(), SettingOption_.setting, Setting_.name
-                        )
-                );
-        }
+        if (!StringUtils.isEmpty(filter.getSetting()))
+            specification = specification.and((root, query, builder) -> builder.equal(
+                    root.get(SettingOption_.setting).get(Setting_.code),
+                    StringUtils.upperCase(filter.getSetting()).trim()
+            ));
 
         return specification;
     }

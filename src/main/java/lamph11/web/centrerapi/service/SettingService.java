@@ -11,6 +11,7 @@ import lamph11.web.centrerapi.repository.SettingRepository;
 import lamph11.web.centrerapi.resources.dto.setting.SettingDTO;
 import lamph11.web.centrerapi.resources.dto.setting.SettingFilter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,17 +50,17 @@ public class SettingService extends QueryService {
     }
 
     /**
-     * get info setting by id
+     * get info setting by code
      *
-     * @param id setting id
+     * @param code setting code
      * @return setting info
      * @throws LphException
      */
     @Transactional(readOnly = true)
-    public SettingDTO infoSetting(String id) throws ResourceNotFoundException {
-        Optional<Setting> optionalSetting = settingRepository.findById(id);
+    public SettingDTO infoSetting(String code) throws ResourceNotFoundException {
+        Optional<Setting> optionalSetting = settingRepository.findById(code);
         if (!optionalSetting.isPresent())
-            throw new ResourceNotFoundException(Setting.class, id);
+            throw new ResourceNotFoundException(Setting.class, code);
 
         return optionalSetting.map(this::toDTO).get();
     }
@@ -70,9 +71,11 @@ public class SettingService extends QueryService {
      * @param dto setting info from request
      * @return saved setting
      */
-    public SettingDTO create(SettingDTO dto) {
+    public SettingDTO create(SettingDTO dto) throws LphException {
+        Optional<Setting> optional = settingRepository.findById(dto.getCode());
+        if (optional.isPresent())
+            throw new LphException("Setting is existed");
         Setting setting = toEntity(dto);
-        setting.setId(UUIDUtils.generateId());
         settingRepository.save(setting);
         return toDTO(setting);
     }
@@ -86,14 +89,24 @@ public class SettingService extends QueryService {
     public Specification buildSpecification(SettingFilter filter) {
         Specification specification = Specification.where(null);
 
-        if (filter.getId() != null)
-            specification = specification.and(buildStringSpecification(filter.getId(), Setting_.id));
+        if (filter.getCode() != null)
+            specification = specification.and(buildStringSpecification(filter.getCode(), Setting_.code));
 
-        if (filter.getName() != null)
-            specification = specification.and(buildStringSpecification(filter.getName(), Setting_.name));
-
-        if (filter.getMetadata() != null)
-            specification = specification.and(buildSpecification(filter.getMetadata(), Setting_.metadata));
+        if (!StringUtils.isEmpty(filter.getKeyword()))
+            specification = specification.and((root, query, builder) -> builder.or(
+                    builder.like(
+                            builder.lower(root.get(Setting_.code)),
+                            "%" + StringUtils.lowerCase(filter.getKeyword()).trim() + "%"
+                    ),
+                    builder.like(
+                            builder.lower(root.get(Setting_.description)),
+                            "%" + StringUtils.lowerCase(filter.getKeyword()).trim() + "%"
+                    ),
+                    builder.like(
+                            builder.lower(root.get(Setting_.metadata)),
+                            "%" + filter.getKeyword() + "%"
+                    )
+            ));
 
         return specification;
     }

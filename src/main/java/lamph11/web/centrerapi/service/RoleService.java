@@ -118,9 +118,18 @@ public class RoleService extends QueryService<Role> {
 
         if (filter.getKeyword() != null)
             specification = specification.and((root, query, builder) -> builder.or(
-                    builder.like(root.get(Role_.ROLE), StringUtils.join("%", filter.getName(), "%")),
-                    builder.like(root.get(Role_.DESCRIPTION), StringUtils.join("%", filter.getName(), "%")),
-                    builder.like(root.get(Role_.METADATA), StringUtils.join("%", filter.getName(), "%"))
+                    builder.like(
+                            builder.lower(root.get(Role_.ROLE)),
+                            StringUtils.join("%", filter.getName().toLowerCase(), "%")
+                    ),
+                    builder.like(
+                            builder.lower(root.get(Role_.DESCRIPTION)),
+                            StringUtils.join("%", filter.getName().toLowerCase(), "%")
+                    ),
+                    builder.like(
+                            builder.lower(root.get(Role_.METADATA)),
+                            StringUtils.join("%", filter.getName().toLowerCase(), "%")
+                    )
             ));
 
         return specification;

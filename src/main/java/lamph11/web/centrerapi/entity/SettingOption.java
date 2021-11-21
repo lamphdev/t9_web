@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @Entity
 @Table(name = "lph_setting_option", uniqueConstraints = {
-        @UniqueConstraint(name = "OPTION_CAN_NOT_DUPLICATE", columnNames = {"setting_id", "name"})
+        @UniqueConstraint(name = "OPTION_CAN_NOT_DUPLICATE", columnNames = {"setting", "value"})
 })
 public class SettingOption {
 
@@ -32,6 +32,6 @@ public class SettingOption {
     private String metadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "setting_id", nullable = false)
+    @JoinColumn(name = "setting", nullable = false)
     private Setting setting;
 }

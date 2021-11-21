@@ -34,50 +34,45 @@ public class SettingResource {
     }
 
     @PostMapping
-    public ResponseEntity createSetting(@Validated(Default.class) @RequestBody SettingDTO dto) {
+    public ResponseEntity createSetting(@Validated(Default.class) @RequestBody SettingDTO dto) throws LphException {
         return ResponseEntity.ok(settingService.create(dto));
     }
 
-    @RequestMapping("/{settingId}")
-    public ResponseEntity infoSetting(@PathVariable("settingId") String settingId) throws ResourceNotFoundException {
-        return ResponseEntity.ok(settingService.infoSetting(settingId));
+    @GetMapping("/{settingCode}")
+    public ResponseEntity infoSetting(@PathVariable("settingCode") String code) throws ResourceNotFoundException {
+        return ResponseEntity.ok(settingService.infoSetting(code));
     }
 
-    @GetMapping("/{settingId}/options")
+    @GetMapping("/{settingCode}/options")
     public ResponseEntity getOptions(
-            @PathVariable("settingId") String settingId, @ModelAttribute SettingOptionFilter filter
+            @PathVariable("settingCode") String settingCode, @ModelAttribute SettingOptionFilter filter
     ) {
-        if (filter.getSetting() == null)
-            filter.setSetting(new SettingFilter());
-
-        StringFilter settingIdFilter = new StringFilter();
-        settingIdFilter.setEquals(settingId);
-        filter.getSetting().setId(settingIdFilter);
+        filter.setSetting(settingCode);
         return ResponseEntity.ok(
                 PageResponse.from(settingOptionService.getPageBySetting(filter))
         );
     }
 
-    @PostMapping("/{settingId}/options")
+    @PostMapping("/{settingCode}/options")
     public ResponseEntity<SettingOptionDTO> createOption(
-            @PathVariable("settingId") String settingId, @Validated @RequestBody SettingOptionDTO settingOption
+            @PathVariable("settingCode") String settingCode, @Validated @RequestBody SettingOptionDTO settingOption
     ) throws LphException {
         SettingDTO setting = new SettingDTO();
-        setting.setId(settingId);
+        setting.setCode(settingCode);
         settingOption.setSetting(setting);
         return ResponseEntity.ok(
                 settingOptionService.create(settingOption)
         );
     }
 
-    @PostMapping("/{settingId}/options/{optionId}")
+    @PostMapping("/{settingCode}/options/{optionId}")
     public ResponseEntity<SettingOptionDTO> updateOption(
-            @PathVariable("settingId") String settingId,
+            @PathVariable("settingCode") String settingCode,
             @PathVariable("optionId") String optionId,
             @Validated @ModelAttribute SettingOptionDTO settingOption
     ) throws LphException {
         SettingDTO setting = new SettingDTO();
-        setting.setId(settingId);
+        setting.setCode(settingCode);
         settingOption.setId(optionId);
         settingOption.setSetting(setting);
         return ResponseEntity.ok(

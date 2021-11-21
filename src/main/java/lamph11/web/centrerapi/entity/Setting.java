@@ -1,6 +1,7 @@
 package lamph11.web.centrerapi.entity;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -9,23 +10,24 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "lph_setting", uniqueConstraints = {
-        @UniqueConstraint(name = "SETTING_NAME_IS_REQUIRED", columnNames = {"name"})
-})
+@Table(name = "lph_setting")
 public class Setting {
 
     @Id
-    @Column(length = 100)
-    private String id;
+    @Length(max = 200)
+    @Column(length = 200)
+    private String code;
 
-    @NotEmpty
-    @Length(max = 250)
-    @Column(nullable = false, length = 250)
-    private String name;
+    private String description;
 
     @Column(length = 1024)
     private String metadata;
 
     @OneToMany(mappedBy = "setting")
     private List<SettingOption> options;
+
+    @PrePersist
+    public void upperCode() {
+        this.code = StringUtils.upperCase(code);
+    }
 }
