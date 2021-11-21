@@ -11,10 +11,11 @@ import java.util.List;
 @Data
 public class SettingDTO {
 
-    private String id;
-
     @NotEmpty(message = ValidateMessage.REQUIRED)
-    private String name;
+    private String code;
+
+    @Length(max = 1024, message = ValidateMessage.MAX_LENGTH)
+    private String description;
 
     @Length(max = 500, message = ValidateMessage.MAX_LENGTH)
     private String metadata;

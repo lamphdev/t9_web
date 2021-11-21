@@ -7,10 +7,8 @@ import lombok.Data;
 @Data
 public class SettingFilter extends PageableRequest {
 
-    private StringFilter id;
+    private StringFilter code;
 
-    private StringFilter name;
-
-    private StringFilter metadata;
+    private String keyword;
 
 }
