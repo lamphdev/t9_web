@@ -10,7 +10,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/lamph11/Desktop/story/dbdata
+      device: ./dbdata
 
 services:
   database:
@@ -27,7 +27,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
-    user: lamph
   app:
     hostname: beapp
     build: .
