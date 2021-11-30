@@ -29,7 +29,6 @@ public class SettingResource {
 
     @GetMapping
     public ResponseEntity querySetting(@ModelAttribute SettingFilter filter, HttpServletRequest request) {
-        System.out.println(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE));
         return ResponseEntity.ok(PageResponse.from(settingService.querySetting(filter)));
     }
 

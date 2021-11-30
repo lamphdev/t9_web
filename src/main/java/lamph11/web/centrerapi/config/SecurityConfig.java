@@ -1,8 +1,6 @@
 package lamph11.web.centrerapi.config;
 
-import lamph11.web.centrerapi.common.auth.DynamicAuthorizationFilter;
-import lamph11.web.centrerapi.common.auth.LphAuthenticationEntrypoint;
-import lamph11.web.centrerapi.common.auth.TokenAuthFilter;
+import lamph11.web.centrerapi.common.auth.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -29,12 +27,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
 
         http.authorizeRequests(
-                autho -> {
-                    autho.anyRequest().permitAll();
-                    autho.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                auth -> {
+                    auth.anyRequest().permitAll();
+                    auth.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
                         @Override
                         public <O extends FilterSecurityInterceptor> O postProcess(O o) {
                             o.setSecurityMetadataSource(dynamicAuthorizationFilter);
+                            o.setAccessDecisionManager(new LphAccessDecisionManager());
                             return o;
                         }
                     });
@@ -56,6 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling(
                 handler -> {
                     handler.authenticationEntryPoint(new LphAuthenticationEntrypoint());
+                    handler.accessDeniedHandler(new LphAccessDeniedHandler());
                 }
         );
     }
